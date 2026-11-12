@@ -1,0 +1,19 @@
+[project]
+name = "omie-analysis"
+version = "0.1.0"
+description = "Iberian day-ahead electricity price analysis and forecasting (OMIE, PT/ES)"
+requires-python = ">=3.11"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
