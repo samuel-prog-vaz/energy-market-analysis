@@ -8,9 +8,18 @@
 _One-paragraph summary and headline result go here once the analysis is done._
 
 ## Data
-- **Source:** [OMIE](https://www.omie.es/) day-ahead market, hourly marginal prices for Portugal (PT) and Spain (ES)
-- **Period:** _TBD_
-- **Note:** since 1 Oct 2025 the day-ahead market clears in 15-minute periods; _how this is handled: TBD_
+- **Source:** [OMIE](https://www.omie.es/) day-ahead market, marginal price files (`marginalpdbc`) for Portugal (PT) and Spain (ES), in EUR/MWh
+- **Period:** 1 Jan 2018 to the latest published day
+- **Time handling:** the market day runs in Spanish time (Europe/Madrid). Each period is converted to a UTC start time, so DST days (23 or 25 hours) form a continuous series with no duplicated or missing hours. `datetime_local` is kept for analysing daily patterns.
+- **15-minute switch:** since 1 Oct 2025 the day-ahead market clears in 15-minute periods. Two datasets are built:
+  - `omie_prices_native.parquet`: every period as published (hourly, then 15-minute)
+  - `omie_prices_hourly.parquet`: one continuous hourly series, with quarter-hours averaged to hours. Modelling uses this one.
+- **Validation:** checks for the expected number of periods per day, duplicates, missing hours, missing values and out-of-range prices. The results and a yearly summary are in [reports/data_quality.md](reports/data_quality.md).
+
+```bash
+python -m omie.download   # fetch raw files into data/raw/ (re-run to update; existing files are skipped)
+python -m omie.clean      # build data/processed/*.parquet and the quality report
+```
 
 ## Method
 1. Data download, cleaning and validation (DST, gaps, outliers)
