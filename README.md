@@ -2,66 +2,79 @@
 
 > How do Iberian day-ahead electricity prices behave, and can a simple model beat a naive forecast?
 
-**Status:** 🚧 Work in progress (target: January 2027)
+**Status:** 🚧 Work in progress. Data pipeline and exploration done; forecasting next
+(target: January 2027).
 
-## TL;DR
-_One-paragraph summary and headline result go here once the analysis is done._
+## Why it matters
 
-## Data
-- **Source:** [OMIE](https://www.omie.es/) day-ahead market, marginal price files (`marginalpdbc`) for Portugal (PT) and Spain (ES), in EUR/MWh
-- **Period:** 1 Jan 2018 to the latest published day
-- **Time handling:** the market day runs in Spanish time (Europe/Madrid). Each period is converted to a UTC start time, so DST days (23 or 25 hours) form a continuous series with no duplicated or missing hours. `datetime_local` is kept for analysing daily patterns.
-- **15-minute switch:** since 1 Oct 2025 the day-ahead market clears in 15-minute periods. Two datasets are built:
-  - `omie_prices_native.parquet`: every period as published (hourly, then 15-minute)
-  - `omie_prices_hourly.parquet`: one continuous hourly series, with quarter-hours averaged to hours. Modelling uses this one.
-- **Validation:** checks for the expected number of periods per day, duplicates, missing hours, missing values and out-of-range prices. The results and a yearly summary are in [reports/data_quality.md](reports/data_quality.md).
-
-```bash
-python -m omie.download   # fetch raw files into data/raw/ (re-run to update; existing files are skipped)
-python -m omie.clean      # build data/processed/*.parquet and the quality report
-```
+Electricity prices in Portugal and Spain are set daily, hour by hour, in the OMIE day-ahead market.
+The fast growth of solar power is changing how these prices behave: cheaper middays, more
+expensive evenings, and the first negative prices. Understanding and forecasting these patterns
+matters for anyone who buys, sells, stores or trades electricity.
 
 ## Method
-1. Data download, cleaning and validation (DST, gaps, outliers)
-2. Exploratory analysis: daily/seasonal patterns, price spikes, PT–ES spread, link to renewables and gas
-3. Forecasting
-   - Naive baselines (same hour previous day / previous week)
-   - Linear regression and gradient boosting (LightGBM)
-   - Walk-forward validation, no look-ahead bias
-4. _(Optional)_ Simulated battery arbitrage backtest
 
-## Results
-_TBD_
+1. **Data:** nearly 9 years of hourly OMIE day-ahead prices for Portugal and Spain (2018–2026),
+   downloaded automatically, cleaned and validated (DST days, the October 2025 switch to
+   15-minute periods, gaps, outliers).
+2. **Exploration:** long-term trends, volatility, daily and weekly patterns, negative prices,
+   Portugal–Spain price differences, autocorrelation.
+3. **Forecasting** *(next)*: naive baselines (same hour yesterday / last week), then linear
+   regression and gradient boosting (LightGBM), validated walk-forward with no look-ahead bias.
+4. **Optional:** simulated battery arbitrage backtest.
+
+## Results so far
+
+![Price relative to the daily average, by hour and year](reports/figures/daily_profile_relative.png)
+
+- **Solar has reshaped the day.** Until 2021 the cheapest hours were at night. Since 2022 they are
+  in the early afternoon; in 2026 the 14:00 hour is about 61 EUR/MWh below the daily average and
+  the 21:00 hour about 59 EUR/MWh above it.
+- **Prices swing much more within the day.** The average daily range went from 30 % of the average
+  price in 2018 to about 150 % in 2025–2026.
+- **Negative prices appeared in April 2024** and are increasing: 613 hours in Portugal in 2026 so
+  far, almost all at midday in spring.
+- **Portugal and Spain split more often**: different prices in 14 % of hours in 2026, against 5 %
+  in 2018, mostly at midday.
+- **Benchmark to beat:** a naive "same hour yesterday" forecast is off by about 20 EUR/MWh on
+  average since 2023 (5 EUR/MWh in 2018–2020).
+
+Full findings, charts and tables: **[docs/analysis.md](docs/analysis.md)**.
+Forecasting results will be added here in the next phase.
 
 ## Limitations
-_TBD_
+
+- The dataset contains only prices. Drivers such as solar output, gas prices and interconnection
+  limits are inferred from price patterns (timing, season, PT–ES splits), not measured. The 2026
+  price climb in particular cannot be explained from prices alone.
+- During the Iberian gas price cap (June 2022 – December 2023), part of the cost of gas generation
+  was charged to consumers outside the day-ahead price.
+- Day-ahead market only; intraday and balancing markets are not covered.
 
 ## Next steps
-_TBD_
 
-## Reproduce
+- Forecasting models and walk-forward evaluation against the naive baselines.
+- Optional: battery arbitrage backtest using the growing daily price range.
+- Possible extension: gas prices (MIBGAS) or generation data (ENTSO-E) to explain price drivers.
+
+## Quickstart
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/samuel-prog-vaz/energy-market-analysis.git
 cd energy-market-analysis
 python -m venv .venv
-.venv\Scripts\activate          # Windows  (macOS/Linux: source .venv/bin/activate)
+.venv\Scripts\activate            # Windows  (macOS/Linux: source .venv/bin/activate)
 pip install -r requirements.txt
 pip install -e .
-pytest
+python -m omie.download           # fetch OMIE price files
+python -m omie.clean              # build the clean dataset
 ```
 
-## Project structure
-
-```
-data/
-  raw/          # downloaded OMIE files (not committed)
-  processed/    # cleaned datasets (not committed)
-notebooks/      # exploration and modelling notebooks
-reports/figures/# exported charts for the README
-src/omie/       # reusable code (download, cleaning, features, models)
-tests/          # unit tests
-```
+Then open [notebooks/01_exploration.ipynb](notebooks/01_exploration.ipynb).
+Architecture, design decisions, testing and dependencies:
+**[docs/technical.md](docs/technical.md)**.
 
 ## Stack
-Python 3.12 · pandas · scikit-learn · LightGBM · statsmodels · matplotlib/seaborn · Jupyter
+
+Python 3.12 · pandas · matplotlib/seaborn · statsmodels · scikit-learn · LightGBM · Jupyter ·
+pytest · ruff
