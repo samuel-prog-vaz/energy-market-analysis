@@ -2,10 +2,9 @@
 
 > How do Iberian day-ahead electricity prices behave, and can a simple model beat a naive forecast?
 
-**Status:** 🚧 Work in progress. Data pipeline, exploration and forecasting done; final
-write-up next (target: January 2027).
+**Status:** ✅ Complete (November 2026). All results use data up to 14 November 2026.
 
-**Answer so far:** yes, modestly. A LightGBM model beats the naive "same hour yesterday" forecast
+**Answer:** yes, modestly. A LightGBM model beats the naive "same hour yesterday" forecast
 by 9 % (MAE 17.9 vs 19.7 EUR/MWh) over almost three years of walk-forward testing, a statistically
 significant gain that comes mostly from Mondays, weekends and holidays.
 
@@ -27,7 +26,11 @@ matters for anyone who buys, sells, stores or trades electricity.
    and the calendar. Naive baselines (same hour yesterday / last week) against linear regression
    (Ridge) and gradient boosting (LightGBM), validated walk-forward from January 2024 with monthly
    retraining and no look-ahead bias (enforced by a unit test).
-4. **Optional:** simulated battery arbitrage backtest.
+
+**Skills demonstrated:** data pipeline engineering (automated download, cleaning, validation,
+time zones and DST), time-series analysis, machine-learning forecasting with leakage-free
+walk-forward validation, statistical testing (Diebold–Mariano), unit testing and reproducible
+project structure.
 
 ## Results
 
@@ -93,12 +96,16 @@ git clone https://github.com/samuel-prog-vaz/energy-market-analysis.git
 cd energy-market-analysis
 python -m venv .venv
 .venv\Scripts\activate            # Windows  (macOS/Linux: source .venv/bin/activate)
-pip install -r requirements.txt
+pip install -r requirements-lock.txt   # exact versions used for the results
 pip install -e .
-python -m omie.download           # fetch OMIE price files
+python -m omie.download           # fetch OMIE price files (a few minutes the first time)
 python -m omie.clean              # build the clean dataset
 python -m omie.backtest           # walk-forward forecasts and metrics (about 30 s)
 ```
+
+`requirements.txt` lists the same packages with minimum versions, for a more flexible install.
+Running the pipeline later downloads newer days too, so totals will grow; forecasts for the
+published period (up to 14 November 2026) stay the same.
 
 Then open [notebooks/01_exploration.ipynb](notebooks/01_exploration.ipynb) and
 [notebooks/02_forecasting.ipynb](notebooks/02_forecasting.ipynb).
@@ -109,3 +116,7 @@ Architecture, design decisions, testing and dependencies:
 
 Python 3.12 · pandas · matplotlib/seaborn · statsmodels · scikit-learn · LightGBM · Jupyter ·
 pytest · ruff
+
+## License
+
+[MIT](LICENSE). Price data © OMIE, publicly available at [omie.es](https://www.omie.es/).

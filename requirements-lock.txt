@@ -1,0 +1,28 @@
+# Exact versions used to produce the published results (Python 3.12, November 2026).
+# Install with:  pip install -r requirements-lock.txt
+# requirements.txt has the same packages with minimum versions, for a flexible install.
+
+# Core
+pandas==3.1.1
+numpy==2.5.4
+requests==2.34.2
+truststore==0.10.5
+tabulate==0.10.0
+pyarrow==26.0.1
+
+# Analysis / modelling
+matplotlib==3.11.2
+seaborn==0.13.2
+scikit-learn==1.9.1
+scipy==1.18.1
+lightgbm==4.7.0
+statsmodels==0.15.0
+holidays==0.108
+
+# Notebooks
+jupyterlab==4.6.6
+ipykernel==7.4.0
+
+# Dev
+pytest==9.2.0
+ruff==0.17.5

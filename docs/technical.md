@@ -225,8 +225,12 @@ Run them with `pytest` (22 tests). Code style is checked with `ruff check src te
 
 ## 7. Dependencies
 
-Python 3.11 or later (developed on 3.12). All packages are listed in
-[requirements.txt](../requirements.txt).
+Python 3.11 or later (developed on 3.12). Two dependency files:
+
+- [requirements-lock.txt](../requirements-lock.txt): exact versions used to produce the published
+  results (direct dependencies only, so it installs on Windows, macOS and Linux);
+- [requirements.txt](../requirements.txt): the same packages with minimum versions, for a flexible
+  install.
 
 | Package | Used for |
 |---|---|
@@ -240,7 +244,7 @@ Python 3.11 or later (developed on 3.12). All packages are listed in
 | holidays | Portuguese and Spanish public holiday calendars (offline) |
 | scikit-learn | Ridge regression and preprocessing (scaling, one-hot encoding) |
 | lightgbm | Gradient boosting model |
-| scipy | Diebold–Mariano significance test (installed with scikit-learn) |
+| scipy | Diebold–Mariano significance test |
 | jupyterlab, ipykernel | Notebooks |
 | pytest | Unit tests |
 | ruff | Linting and formatting |
@@ -252,7 +256,7 @@ git clone <repo-url>
 cd energy-market-analysis
 python -m venv .venv
 .venv\Scripts\activate            # Windows  (macOS/Linux: source .venv/bin/activate)
-pip install -r requirements.txt
+pip install -r requirements-lock.txt
 pip install -e .
 pytest                            # unit tests
 python -m omie.download           # fetch raw data (re-run to update)
