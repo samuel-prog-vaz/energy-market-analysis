@@ -29,9 +29,9 @@ def load_hourly() -> pd.DataFrame:
     df["year"] = idx.year
     df["month"] = idx.month
     df["hour"] = idx.hour
-    df["weekday"] = idx.weekday
+    df["weekday"] = idx.day_of_week
     df["weekday_name"] = pd.Categorical(
-        [WEEKDAY_NAMES[d] for d in idx.weekday], categories=WEEKDAY_NAMES, ordered=True
+        [WEEKDAY_NAMES[d] for d in idx.day_of_week], categories=WEEKDAY_NAMES, ordered=True
     )
     df["is_weekend"] = df["weekday"] >= 5
     return df

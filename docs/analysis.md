@@ -1,8 +1,9 @@
 # Energy analysis: Iberian day-ahead prices
 
 This document collects the findings of the project. The code behind every chart and number is in
-[notebooks/01_exploration.ipynb](../notebooks/01_exploration.ipynb). For how the data is built
-and validated, see [technical.md](technical.md).
+[notebooks/01_exploration.ipynb](../notebooks/01_exploration.ipynb). For the forecasting results,
+see [forecasting.md](forecasting.md); for how the data is built and validated, see
+[technical.md](technical.md).
 
 **Data:** OMIE day-ahead market, hourly prices in EUR/MWh, 1 Jan 2018 to 14 Nov 2026.
 From 1 Oct 2025 the market clears in 15-minute periods; these are averaged to hours.
@@ -166,8 +167,8 @@ Autocorrelation measures how similar the price is to itself a given number of ho
   slowly. This cannot be used for a day-ahead forecast, since the previous hour is not yet known
   when tomorrow's forecast is made.
 
-**Naive forecast errors** (mean absolute error, EUR/MWh) are the benchmark the models in step 4
-must beat:
+**Naive forecast errors** (mean absolute error, EUR/MWh) are the benchmark the forecasting models
+must beat (results in [forecasting.md](forecasting.md)):
 
 | Naive forecast | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 |
 |---|---|---|---|---|---|---|---|---|---|

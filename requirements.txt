@@ -12,6 +12,7 @@ seaborn>=0.13
 scikit-learn>=1.5
 lightgbm>=4.3
 statsmodels>=0.14
+holidays>=0.50
 
 # Notebooks
 jupyterlab>=4.2
